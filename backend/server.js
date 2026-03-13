@@ -14,7 +14,10 @@ app.set('trust proxy', 1);
 
 // Middleware
 app.use(cors({
-  origin: [process.env.FRONTEND_URL || 'http://localhost:5173', 'https://dark-web-diaries.vercel.app'],
+  origin: function (origin, callback) {
+    // Allow all requests for now, including from missing origins (like mobile apps/postman)
+    callback(null, true);
+  },
   credentials: true
 }));
 app.use(express.json());
@@ -24,7 +27,7 @@ let isConnected = false;
 
 const connectDB = async () => {
   if (isConnected) return;
-  
+
   try {
     const conn = await mongoose.connect(process.env.DB_URI, {
       serverSelectionTimeoutMS: 5000,
